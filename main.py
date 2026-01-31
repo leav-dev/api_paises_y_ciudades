@@ -24,7 +24,7 @@ Documentación automática disponible en:
     - Swagger UI: http://localhost:8000/docs
     - ReDoc: http://localhost:8000/redoc
 
-Autor: [Tu nombre]
+Autor: Ing. Eduardo Pimienta
 Fecha: Enero 2026
 =============================================================================
 """
@@ -33,9 +33,9 @@ Fecha: Enero 2026
 # Importamos la clase FastAPI que será el núcleo de nuestra aplicación
 from fastapi import FastAPI
 
-# Importamos el router del controlador de clima
+# Importamos el router del controlador de países
 # Los routers permiten organizar los endpoints en módulos separados
-from controllers.weathercontroller import router as weather_router
+from controllers.countrycontroller import router as countries_router
 
 
 # =============================================================================
@@ -44,28 +44,30 @@ from controllers.weathercontroller import router as weather_router
 # Creamos la instancia principal de FastAPI
 # Esta instancia es el punto central que maneja todas las peticiones
 app = FastAPI(
-    title="Weather API",  # Título que aparece en la documentación
+    title="Countries API",  # Título que aparece en la documentación
     description="""
-    ## API de Clima 🌤️
+    ## API de Países 🌍
     
-    Esta API permite consultar información meteorológica de cualquier ciudad
-    del mundo utilizando los servicios de OpenWeatherMap.
+    Esta API permite consultar información detallada sobre países de todo el mundo
+    utilizando los servicios de REST Countries API.
     
     ### Funcionalidades:
-    * Obtener temperatura actual
-    * Consultar humedad
-    * Ver descripción del clima en español
+    * Obtener información básica de países
+    * Consultar población, capital y región
+    * Ver monedas y idiomas oficiales
+    * Buscar países por moneda o idioma
+    * Obtener banderas de países
     
     ### Tecnologías utilizadas:
     * FastAPI - Framework web
     * httpx - Cliente HTTP asíncrono
     * Pydantic - Validación de datos
-    * OpenWeatherMap API - Datos meteorológicos
+    * REST Countries API - Datos de países
     """,
     version="1.0.0",  # Versión de la API
     contact={
-        "name": "Tu Nombre",
-        "email": "tu@email.com"
+        "name": "Ing. Luis E. Albor",
+        "email": "luis.e@example.com"
     },
     license_info={
         "name": "MIT",
@@ -94,24 +96,27 @@ def home():
         dict: Mensaje de bienvenida
         
     Ejemplo de respuesta:
-        {"message": "Welcome to the Weather API"}
+        {"message": "Welcome to the Countries API"}
     """
     return {
-        "message": "Welcome to the Weather API",
+        "message": "Welcome to the Countries API",
         "docs": "Visita /docs para ver la documentación interactiva",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "description": "API para consultar información de países del mundo"
     }
 
 
 # =============================================================================
 # REGISTRO DE ROUTERS
 # =============================================================================
-# Incluimos el router del controlador de clima
+# Incluimos el router del controlador de países
 # Esto registra todas las rutas definidas en weathercontroller.py
 # 
 # Después de esto, las siguientes rutas estarán disponibles:
-# - GET /api/weather/{city} - Obtener clima de una ciudad
-app.include_router(weather_router)
+# - GET /api/countries/{country} - Obtener información de un país
+# - GET /api/countries/currency/{currency} - Buscar países por moneda
+# - GET /api/countries/language/{language} - Buscar países por idioma
+app.include_router(countries_router)
 
 
 # =============================================================================
