@@ -24,7 +24,7 @@ Documentación automática disponible en:
   - Swagger UI: http://localhost:8000/docs
   - ReDoc: http://localhost:8000/redoc
 
-Autor: Ing. Eduardo Pimienta
+Autor: Ing. Luis E. Albor Vega
 Fecha: Enero 2026
 =============================================================================
 """

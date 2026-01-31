@@ -39,7 +39,7 @@ Ejemplo de respuesta generada:
   "country_code": "CO"
 }
 
-Autor: Ing. Eduardo Pimienta
+Autor: Ing. Luis E. Albor Vega
 Fecha: Enero 2026
 =============================================================================
 """

@@ -20,7 +20,7 @@ Ventajas de esta API:
 - Datos actualizados y completos
 - Múltiples endpoints para diferentes consultas
 
-Autor: Ing. Eduardo Pimienta
+Autor: Ing. Luis E. Albor Vega
 Fecha: Enero 2026
 =============================================================================
 """

@@ -17,7 +17,7 @@ Endpoints disponibles:
 - GET /api/countries/currency/{currency} - Países por moneda
 - GET /api/countries/language/{language} - Países por idioma
 
-Autor: Ing. Eduardo Pimienta
+Autor: Ing. Luis E. Albor Vega
 Fecha: Enero 2026
 =============================================================================
 """

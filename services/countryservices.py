@@ -18,7 +18,7 @@ Responsabilidades de este servicio:
 3. Transformar los datos crudos de la API en DTOs estructurados
 4. Manejar errores de configuración y validación
 
-Autor: Ing. Eduardo Pimienta
+Autor: Ing. Luis E. Albor Vega
 Fecha: Enero 2026
 =============================================================================
 """
