@@ -51,77 +51,77 @@ load_dotenv()
 
 
 class AppSettings:
-    """
-    Clase de configuración que contiene todas las constantes de la aplicación.
+  """
+  Clase de configuración que contiene todas las constantes de la aplicación.
+  
+  Usamos una clase en lugar de variables sueltas por las siguientes razones:
+  - Agrupa todas las configuraciones en un solo lugar
+  - Permite validación y transformación de valores
+  - Facilita el autocompletado en el IDE
+  - Es más fácil de mockear en tests
+  
+  Uso:
+    from appsettings import AppSettings
     
-    Usamos una clase en lugar de variables sueltas por las siguientes razones:
-    - Agrupa todas las configuraciones en un solo lugar
-    - Permite validación y transformación de valores
-    - Facilita el autocompletado en el IDE
-    - Es más fácil de mockear en tests
-    
-    Uso:
-        from appsettings import AppSettings
-        
-        base_url = AppSettings.RESTCOUNTRIES_BASE_URL
-        timeout = AppSettings.TIMEOUT_SECONDS
-    
-    Nota: Todos los atributos son de clase (class attributes), no de instancia.
-    Esto significa que no necesitas crear una instancia para usarlos:
-        AppSettings.RESTCOUNTRIES_BASE_URL  # ✓ Correcto
-        AppSettings().RESTCOUNTRIES_BASE_URL  # También funciona, pero innecesario
-    """
+    base_url = AppSettings.RESTCOUNTRIES_BASE_URL
+    timeout = AppSettings.TIMEOUT_SECONDS
+  
+  Nota: Todos los atributos son de clase (class attributes), no de instancia.
+  Esto significa que no necesitas crear una instancia para usarlos:
+    AppSettings.RESTCOUNTRIES_BASE_URL  # ✓ Correcto
+    AppSettings().RESTCOUNTRIES_BASE_URL  # También funciona, pero innecesario
+  """
 
-    # =========================================================================
-    # CONFIGURACIÓN DE LA API DE REST COUNTRIES
-    # =========================================================================
-    
-    # URL base de la API de REST Countries - Versión 3.1
-    # Documentación: https://restcountries.com/
-    # Esta API es completamente gratuita y no requiere API Key
-    RESTCOUNTRIES_BASE_URL = os.getenv("RESTCOUNTRIES_BASE_URL", "https://restcountries.com/v3.1")
-    
-    # Endpoints específicos de la API
-    # Obtener todos los países: {BASE_URL}/all
-    # Buscar por nombre: {BASE_URL}/name/{name}
-    # Buscar por código: {BASE_URL}/alpha/{code}
-    # Buscar por moneda: {BASE_URL}/currency/{currency}
-    # Buscar por idioma: {BASE_URL}/lang/{language}
+  # =========================================================================
+  # CONFIGURACIÓN DE LA API DE REST COUNTRIES
+  # =========================================================================
+  
+  # URL base de la API de REST Countries - Versión 3.1
+  # Documentación: https://restcountries.com/
+  # Esta API es completamente gratuita y no requiere API Key
+  RESTCOUNTRIES_BASE_URL = os.getenv("RESTCOUNTRIES_BASE_URL", "https://restcountries.com/v3.1")
+  
+  # Endpoints específicos de la API
+  # Obtener todos los países: {BASE_URL}/all
+  # Buscar por nombre: {BASE_URL}/name/{name}
+  # Buscar por código: {BASE_URL}/alpha/{code}
+  # Buscar por moneda: {BASE_URL}/currency/{currency}
+  # Buscar por idioma: {BASE_URL}/lang/{language}
 
-    # =========================================================================
-    # CONFIGURACIÓN DE LLAMADAS HTTP
-    # =========================================================================
-    
-    # Tiempo máximo de espera para las peticiones HTTP (en segundos)
-    # Si la API de REST Countries no responde en este tiempo, se lanza un error
-    # Un valor muy bajo puede causar errores en redes lentas
-    # Un valor muy alto puede hacer que la aplicación parezca "colgada"
-    TIMEOUT_SECONDS = int(os.getenv("RESTCOUNTRIES_TIMEOUT", "10"))
-    
-    # =========================================================================
-    # CONFIGURACIÓN DE FILTROS Y CAMPOS
-    # =========================================================================
-    
-    # Campos por defecto que queremos obtener de la API para optimizar respuestas
-    # La API permite filtrar campos específicos para reducir el tamaño de respuesta
-    # Ejemplo: ?fields=name,capital,population,currencies,languages,flags
-    DEFAULT_FIELDS = "name,capital,population,currencies,languages,flags,region,subregion,cca2,cca3"
-    
-    # =========================================================================
-    # CONFIGURACIÓN DE LA APLICACIÓN
-    # =========================================================================
-    
-    # Información de la aplicación
-    APP_NAME = os.getenv("APP_NAME", "Countries API")
-    APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
-    
-    # Configuración de logging
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-    
-    # =========================================================================
-    # CONFIGURACIÓN DE CACHE (OPCIONAL)
-    # =========================================================================
-    
-    # Tiempo de cache en segundos para respuestas de países
-    # Los datos de países no cambian frecuentemente, por lo que podemos cachearlos
-    CACHE_TTL_SECONDS = int(os.getenv("CACHE_TTL_SECONDS", "3600"))  # 1 hora por defecto
+  # =========================================================================
+  # CONFIGURACIÓN DE LLAMADAS HTTP
+  # =========================================================================
+  
+  # Tiempo máximo de espera para las peticiones HTTP (en segundos)
+  # Si la API de REST Countries no responde en este tiempo, se lanza un error
+  # Un valor muy bajo puede causar errores en redes lentas
+  # Un valor muy alto puede hacer que la aplicación parezca "colgada"
+  TIMEOUT_SECONDS = int(os.getenv("RESTCOUNTRIES_TIMEOUT", "10"))
+  
+  # =========================================================================
+  # CONFIGURACIÓN DE FILTROS Y CAMPOS
+  # =========================================================================
+  
+  # Campos por defecto que queremos obtener de la API para optimizar respuestas
+  # La API permite filtrar campos específicos para reducir el tamaño de respuesta
+  # Ejemplo: ?fields=name,capital,population,currencies,languages,flags
+  DEFAULT_FIELDS = "name,capital,population,currencies,languages,flags,region,subregion,cca2,cca3"
+  
+  # =========================================================================
+  # CONFIGURACIÓN DE LA APLICACIÓN
+  # =========================================================================
+  
+  # Información de la aplicación
+  APP_NAME = os.getenv("APP_NAME", "Countries API")
+  APP_VERSION = os.getenv("APP_VERSION", "1.0.0")
+  
+  # Configuración de logging
+  LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+  
+  # =========================================================================
+  # CONFIGURACIÓN DE CACHE (OPCIONAL)
+  # =========================================================================
+  
+  # Tiempo de cache en segundos para respuestas de países
+  # Los datos de países no cambian frecuentemente, por lo que podemos cachearlos
+  CACHE_TTL_SECONDS = int(os.getenv("CACHE_TTL_SECONDS", "3600"))  # 1 hora por defecto

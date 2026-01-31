@@ -32,21 +32,66 @@ router = APIRouter(prefix="/api")
 
 @router.get("/countries/{country}", response_model=CountryResponseDTO)
 async def get_country(country: str):
-    """
-    Obtiene información detallada de un país específico.
-    
-    Args:
-        country (str): Nombre del país a consultar (ej: "colombia", "spain")
-    
-    Returns:
-        CountryResponseDTO: Información completa del país
-    
-    Raises:
-        HTTPException(404): Si el país no existe
-        HTTPException(500): Si hay errores del servidor
-    """
-    async with httpx.AsyncClient() as http_client:
-        countries_service = CountriesService()
-        country_response = await countries_service.get_country(country, http_client)
-        return country_response
-    
+  """
+  Obtiene información detallada de un país específico.
+  
+  Args:
+    country (str): Nombre del país a consultar (ej: "colombia", "spain")
+  
+  Returns:
+    CountryResponseDTO: Información completa del país
+  
+  Raises:
+    HTTPException(404): Si el país no existe
+  
+  Errors:
+    HTTPException(500): Si hay errores del servidor
+  """
+  async with httpx.AsyncClient() as http_client:
+    countries_service = CountriesService()
+    country_response = await countries_service.get_country(country, http_client)
+    return country_response
+
+@router.get("/codes/countries/{country}", response_model=CountryResponseDTO)
+async def get_country_by_código(code: str):
+  """
+  Obtiene información detallada de un país específico.
+  
+  Args:
+    country (str): codigo del país a consultar (ej: "colombia", "spain")
+  
+  Returns:
+    CountryResponseDTO: Información completa del país
+  
+  Raises:
+    HTTPException(404): Si el país no existe
+  
+  Errors:
+    HTTPException(500): Si hay errores del servidor
+  """
+  async with httpx.AsyncClient() as http_client:
+    countries_service = CountriesService()
+    country_response = await countries_service.get_country_by_code(code, http_client)
+    return country_response
+
+@router.get("/countries/currency/{currency_code}", response_model=list[CountryResponseDTO])
+async def get_countries_by_currency(currency_code: str):
+  """
+  Obtiene información detallada de un país específico.
+  
+  Args:
+    country (str): codigo del país a consultar (ej: "colombia", "spain")
+  
+  Returns:
+    CountryResponseDTO: Información completa del país
+  
+  Raises:
+    HTTPException(404): Si el país no existe
+  
+  Errors:
+    HTTPException(500): Si hay errores del servidor
+  """
+  async with httpx.AsyncClient() as http_client:
+    countries_service = CountriesService()
+    country_response = await countries_service.get_countries_by_currency(currency_code, http_client)
+    return country_response

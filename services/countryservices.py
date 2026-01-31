@@ -40,111 +40,154 @@ from DTOs.countryDtos import CountryResponseDTO
 
 
 class CountriesService:
+  """
+  Servicio principal para obtener información sobre países.
+  
+  Esta clase implementa el patrón de diseño "Service Layer", que separa
+  la lógica de negocio de los controladores y los clientes HTTP.
+  
+  Ventajas de usar un servicio:
+  - Los controladores quedan simples (solo reciben y responden)
+  - La lógica de negocio es reutilizable
+  - Facilita el testing unitario
+  - Permite agregar validaciones, caché, logging, etc.
+  
+  Atributos:
+    client (RestCountriesClient): Instancia del cliente HTTP para REST Countries
+  
+  Ejemplo de uso:
+    async with httpx.AsyncClient() as http_client:
+      service = CountriesService()
+      country = await service.get_country("colombia", http_client)
+      print(country.population)
+  """
+
+  def __init__(self):
     """
-    Servicio principal para obtener información sobre países.
+    Constructor del servicio.
     
-    Esta clase implementa el patrón de diseño "Service Layer", que separa
-    la lógica de negocio de los controladores y los clientes HTTP.
-    
-    Ventajas de usar un servicio:
-    - Los controladores quedan simples (solo reciben y responden)
-    - La lógica de negocio es reutilizable
-    - Facilita el testing unitario
-    - Permite agregar validaciones, caché, logging, etc.
-    
-    Atributos:
-        client (RestCountriesClient): Instancia del cliente HTTP para REST Countries
-    
-    Ejemplo de uso:
-        async with httpx.AsyncClient() as http_client:
-            service = CountriesService()
-            country = await service.get_country("colombia", http_client)
-            print(country.population)
+    Inicializa el servicio creando una instancia del cliente de REST Countries.
+    A diferencia de otras APIs, REST Countries no requiere API key.
     """
+    # Creamos una instancia del cliente de REST Countries
+    # Este cliente se reutilizará en todas las llamadas del servicio
+    self.client = RestCountriesClient()
 
-    def __init__(self):
-        """
-        Constructor del servicio.
-        
-        Inicializa el servicio creando una instancia del cliente de REST Countries.
-        A diferencia de otras APIs, REST Countries no requiere API key.
-        """
-        # Creamos una instancia del cliente de REST Countries
-        # Este cliente se reutilizará en todas las llamadas del servicio
-        self.client = RestCountriesClient()
+  async def get_country(self, country_name: str, http_client: httpx.AsyncClient) -> CountryResponseDTO:
+    """    
+    Ejemplo de respuesta:
+      CountryResponseDTO(
+        name="Colombia",
+        official_name="Republic of Colombia",
+        capital="Bogotá",
+        population=50882884,
+        region="Americas",
+        subregion="South America",
+        currencies=[{"code": "COP", "name": "Colombian peso", "symbol": "$"}],
+        languages=["Spanish"],
+        flag="https://flagcdn.com/w320/co.png",
+        country_code="CO"
+      )
+    """
+    # limpiamos la entrada
+    country_name = country_name.strip()
+    # Consultamos la pai para obtener el pail
+    country_data = await self.client.get_country_by_name(country_name, http_client)
+    country_data = country_data[0]
+    # Convertimos los datos al D
+    currencies = []
+    if "currencies" in country_data:
+      for code, currency_info in country_data["currencies"].items():
+        currencies.append({
+          "code": code,
+          "name": currency_info.get("name", ""),
+          "symbol": currency_info.get("symbol", "")
+        })
+    # Extraer idiomas
+    languages = []
+    if "languages" in country_data:
+      languages = list(country_data["languages"].values())
+    # Obtener capital (puede ser una lista)
+    capital = ""
+    if "capital" in country_data and country_data["capital"]:
+      capital = country_data["capital"][0] if isinstance(country_data["capital"], list) else country_data["capital"]
+    
+    return CountryResponseDTO(
+      name=country_data["name"]["common"],
+      official_name=country_data["name"]["official"],
+      capital=capital,
+      population=country_data.get("population", 0),
+      region=country_data.get("region", ""),
+      subregion=country_data.get("subregion", ""),
+      currencies=currencies,
+      languages=languages,
+      flag=country_data.get("flags", {}).get("png", ""),
+      country_code=country_data.get("cca2", "")
+    )
 
-    async def get_country(self, country_name: str, http_client: httpx.AsyncClient) -> CountryResponseDTO:
-        """
-        Obtiene información detallada de un país y la devuelve en formato estructurado.
-        
-        Este método coordina todo el flujo para obtener información del país:
-        1. Limpia y valida el nombre del país
-        2. Obtiene los datos del país desde REST Countries API
-        3. Transforma los datos en un DTO estructurado
-        
-        Args:
-            country_name (str): Nombre del país a consultar.
-                               Puede contener espacios al inicio/final (serán eliminados).
-                               Ejemplos: "colombia", "spain", "united states"
-            
-            http_client (httpx.AsyncClient): Cliente HTTP asíncrono.
-                        Se inyecta desde el controlador para:
-                        - Reutilizar conexiones (mejor rendimiento)
-                        - Facilitar el testing con mocks
-                        - Controlar el ciclo de vida de las conexiones
-        
-        Returns:
-            CountryResponseDTO: Objeto estructurado con:
-                - name (str): Nombre común del país
-                - official_name (str): Nombre oficial del país
-                - capital (str): Capital principal
-                - population (int): Población total
-                - region (str): Región geográfica
-                - subregion (str): Subregión específica
-                - currencies (list): Lista de monedas
-                - languages (list): Lista de idiomas
-                - flag (str): URL de la bandera
-                - country_code (str): Código de país de 2 letras
-        
-        Raises:
-            HTTPException(404): Si el país no fue encontrado
-            HTTPException(500): Si hay un error con la API de REST Countries
-        
-        Ejemplo de respuesta:
-            CountryResponseDTO(
-                name="Colombia",
-                official_name="Republic of Colombia",
-                capital="Bogotá",
-                population=50882884,
-                region="Americas",
-                subregion="South America",
-                currencies=[{"code": "COP", "name": "Colombian peso", "symbol": "$"}],
-                languages=["Spanish"],
-                flag="https://flagcdn.com/w320/co.png",
-                country_code="CO"
-            )
-        """
-        # =====================================================================
-        # PASO 1: LIMPIAR Y VALIDAR LA ENTRADA
-        # =====================================================================
-        # Eliminamos espacios en blanco al inicio y al final del nombre
-        # Esto evita errores si el usuario escribe " colombia " en lugar de "colombia"
-        country_name = country_name.strip()
+  async def get_country_by_code(self, country_code: str, http_client: httpx.AsyncClient) -> CountryResponseDTO:
+    """
+    Obtiene información de un país por su código ISO (ej: "CO", "US", "FR").
+    
+    Args:
+      country_code (str): Código ISO de 2 letras del país
+      http_client (httpx.AsyncClient): Cliente HTTP para realizar peticiones
+    
+    Returns:
+      CountryResponseDTO: Información estructurada del país
+    
+    Raises:
+      HTTPException: Si el país no existe o hay error en la API
+    """
+    country_code = country_code.strip().upper()
+    country_data = await self.client.get_country_by_code(country_code, http_client)
 
-        # =====================================================================
-        # PASO 2: OBTENER DATOS DEL PAÍS
-        # =====================================================================
-        # Consultamos la API de REST Countries para obtener información completa
-        country_data = await self.client.get_country_by_name(country_name, http_client)
+    currencies = []
+    if "currencies" in country_data:
+      for code, currency_info in country_data["currencies"].items():
+        currencies.append({
+          "code": code,
+          "name": currency_info.get("name", ""),
+          "symbol": currency_info.get("symbol", "")
+        })
+    
+    # Extraer idiomas
+    languages = []
+    if "languages" in country_data:
+      languages = list(country_data["languages"].values())
+    
+    # Obtener capital (puede ser una lista)
+    capital = ""
+    if "capital" in country_data and country_data["capital"]:
+      capital = country_data["capital"][0] if isinstance(country_data["capital"], list) else country_data["capital"]
+    
+    return CountryResponseDTO(
+      name=country_data["name"]["common"],
+      official_name=country_data["name"]["official"],
+      capital=capital,
+      population=country_data.get("population", 0),
+      region=country_data.get("region", ""),
+      subregion=country_data.get("subregion", ""),
+      currencies=currencies,
+      languages=languages,
+      flag=country_data.get("flags", {}).get("png", ""),
+      country_code=country_data.get("cca2", "")
+    )
 
-        # =====================================================================
-        # PASO 3: TRANSFORMAR DATOS EN DTO
-        # =====================================================================
-        # La API devuelve MUCHOS datos (coordenadas, códigos, banderas, etc.)
-        # Nosotros solo extraemos los campos que necesitamos y los
-        # empaquetamos en un DTO con una estructura limpia y documentada
+  async def get_countries_by_currency(self, currency_code: str, http_client: httpx.AsyncClient) -> list[CountryResponseDTO]:
+    """
+    Obtiene todos los países que usan una moneda específica.
+    """
+    currency_code = currency_code.strip().upper()
+    countries_data = await self.client.get_countries_by_currency(currency_code, http_client)
+    
+    # Lista para almacenar todos los países procesados
+    countries_list = []
+    
+    # Iterar sobre cada país en la respuesta
+    for country_data in countries_data:  # ← ESTE ES EL BUCLE QUE TE FALTA
         
-        # Extraer monedas
+        # Procesar monedas para este país
         currencies = []
         if "currencies" in country_data:
             for code, currency_info in country_data["currencies"].items():
@@ -154,17 +197,18 @@ class CountriesService:
                     "symbol": currency_info.get("symbol", "")
                 })
         
-        # Extraer idiomas
+        # Extraer idiomas para este país
         languages = []
         if "languages" in country_data:
             languages = list(country_data["languages"].values())
         
-        # Obtener capital (puede ser una lista)
+        # Obtener capital para este país
         capital = ""
         if "capital" in country_data and country_data["capital"]:
             capital = country_data["capital"][0] if isinstance(country_data["capital"], list) else country_data["capital"]
         
-        return CountryResponseDTO(
+        # Crear el DTO para este país y agregarlo a la lista
+        country_dto = CountryResponseDTO(
             name=country_data["name"]["common"],
             official_name=country_data["name"]["official"],
             capital=capital,
@@ -176,3 +220,7 @@ class CountriesService:
             flag=country_data.get("flags", {}).get("png", ""),
             country_code=country_data.get("cca2", "")
         )
+        
+        countries_list.append(country_dto)
+    
+    return countries_list
