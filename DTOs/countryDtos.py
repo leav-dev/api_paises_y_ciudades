@@ -47,7 +47,7 @@ Fecha: Enero 2026
 # BaseModel es la clase base de Pydantic para definir modelos de datos
 # Proporciona validación automática, serialización y documentación
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any
+from typing import List
 
 
 class CurrencyDTO(BaseModel):

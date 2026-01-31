@@ -27,8 +27,6 @@ Fecha: Enero 2026
 # La usamos para tipar el parámetro http_client
 import httpx
 
-# HTTPException permite lanzar errores HTTP que FastAPI convierte en respuestas
-from fastapi import HTTPException
 
 # Importamos el cliente que se comunica con la API de REST Countries
 # Este cliente encapsula toda la lógica de HTTP
